@@ -1,5 +1,6 @@
 package com.IWalletJavaCase.BookStore.security;
 
+import com.IWalletJavaCase.BookStore.service.TokenService;
 import com.IWalletJavaCase.BookStore.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -23,11 +24,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final UserService userService;
     private final JwtTokenUtil jwtTokenUtil;
-
-    public JwtAuthFilter(UserService userService, JwtTokenUtil jwtTokenUtil) {
+    private final TokenService tokenService;
+    public JwtAuthFilter(UserService userService, JwtTokenUtil jwtTokenUtil, TokenService tokenService) {
         this.userService = userService;
         this.jwtTokenUtil = jwtTokenUtil;
-
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -50,7 +51,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = this.userService.loadUserByUsername(username);
+            if (!tokenService.isTokenInvalidated(jwtToken)){
+            UserDetails userDetails = this.userService.loadUserByUsername(username);
                 logger.info("user loaded " + userDetails);
                 if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
                     logger.info("token validated " + jwtToken);
@@ -60,6 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
+                }
             }
         }
         chain.doFilter(request, response);
