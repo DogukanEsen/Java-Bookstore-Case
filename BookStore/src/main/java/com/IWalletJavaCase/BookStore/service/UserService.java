@@ -21,11 +21,12 @@ public class UserService implements UserDetailsService  {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtTokenUtil;
-
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil) {
+    private final TokenService tokenService;
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, TokenService tokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.tokenService = tokenService;
     }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -57,6 +58,12 @@ public class UserService implements UserDetailsService  {
     public User findUserbyUserId(Long userid){
         return userRepository.findById(userid).orElse(null);
     }
-
+    public String logout(String authorizationHeader){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            tokenService.invalidateToken(token);
+        }
+        return "Logged out successfully.";
+    }
 }
 
