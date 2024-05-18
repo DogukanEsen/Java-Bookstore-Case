@@ -36,11 +36,9 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(x ->
-                        x.requestMatchers("/auth/welcome/**", "/auth/registerUser/**","/auth/loginUser/**","/books").permitAll())
+                        x.requestMatchers("/auth/registerUser/**","/auth/loginUser/**","/book").permitAll())
                 .authorizeHttpRequests(x ->
-                                x.requestMatchers("/auth/user","auth/logout").authenticated())
-                .authorizeHttpRequests(x ->
-                        x.requestMatchers("/user/**").authenticated())
+                                x.requestMatchers("auth/logout").authenticated())
                 .authorizeHttpRequests(x ->
                         x.requestMatchers("/cart/**").authenticated())
                 .sessionManagement(x -> x.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
