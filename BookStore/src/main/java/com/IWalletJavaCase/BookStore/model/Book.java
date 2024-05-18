@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "books")
 public class Book {
@@ -67,5 +69,21 @@ public class Book {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbn,title,description,price,quantity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return isbn == book.isbn && Objects.equals(title, book.title)
+                && Objects.equals(description, book.description)
+                && Objects.equals(price, book.price)
+                && Objects.equals(quantity, book.quantity);
     }
 }
