@@ -22,14 +22,13 @@ public class UserService implements UserDetailsService  {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
     private final CreateCartService createCartService;
     private final TokenService tokenService;
     private final UserDTOMapper userDTOMapper;
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, CreateCartService createCartService, TokenService tokenService, UserDTOMapper userDTOMapper) {
+
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, CreateCartService createCartService, TokenService tokenService, UserDTOMapper userDTOMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtTokenUtil = jwtTokenUtil;
         this.createCartService = createCartService;
         this.tokenService = tokenService;
         this.userDTOMapper = userDTOMapper;
@@ -52,17 +51,6 @@ public class UserService implements UserDetailsService  {
         return userDTOMapper.convert(user);
     }
 
-    public String getUsernameFromRequest(HttpServletRequest request) {
-        final String authorizationHeader = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-            username = jwtTokenUtil.extractUsername(token);
-        }
-        return username;
-    }
 
     public User findUserbyUserId(Long userid){
         return userRepository.findById(userid).orElseThrow(()->new IllegalArgumentException("Username kayıtlı degil."));
@@ -73,6 +61,11 @@ public class UserService implements UserDetailsService  {
             tokenService.invalidateToken(token);
         }
         return "Logged out successfully.";
+    }
+
+    public Long findUserIdbyUsername(String username){
+        User user =  userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("Username kayıtlı degil."));
+        return user.getId();
     }
 }
 
