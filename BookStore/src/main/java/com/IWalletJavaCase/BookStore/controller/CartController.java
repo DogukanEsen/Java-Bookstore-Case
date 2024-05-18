@@ -21,25 +21,25 @@ public class CartController {
     }
 
     @PostMapping("/addItem")
-    public ResponseEntity<List<CartItem>> addBookToCart(HttpServletRequest request, @RequestBody CartItemDTO cartItemDTO) {
+    public ResponseEntity<List<CartItemDTO>> addBookToCart(HttpServletRequest request, @RequestBody CartItemDTO cartItemDTO) {
 
         return ResponseEntity.ok(cartService.addBookToCart(request, cartItemDTO));
     }
 
     @PostMapping("/deleteItem")
-    public ResponseEntity<List<CartItem>> deleteBookToCart(HttpServletRequest request, @RequestBody CartItemDTO cartItemDTO) {
+    public ResponseEntity<List<CartItemDTO>> deleteBookToCart(HttpServletRequest request, @RequestBody CartItemDTO cartItemDTO) {
 
         return ResponseEntity.ok(cartService.deleteBookToCart(request, cartItemDTO));
     }
 
     @GetMapping("/items")
-    public ResponseEntity<List<CartItem>> getCartItems(HttpServletRequest request) {
+    public ResponseEntity<List<CartItemDTO>> getCartItems(HttpServletRequest request) {
         return ResponseEntity.ok(cartService.getCartItems(request));
     }
     @PostMapping("/payment")
     public ResponseEntity<String> checkPayment(HttpServletRequest request){
         String totalPrice = cartService.checkPayment(request);
         return ResponseEntity.ok("Toplam ücret " + totalPrice + " olarak hesaplanmıştır.\n" +
-                                        " sepet başarıyla onaylandı!!");
+                " sepet başarıyla onaylandı!!");
     }
 }
