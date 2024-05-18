@@ -34,4 +34,9 @@ public class BookService {
         return bookRepository.findByIsbn(isbn)
                 .orElseThrow(() ->new BookNotFoundException("Kitap Bulunamadı"));
     }
+    public void removeBookWithIsbn(String isbn, int quantity){
+        Book book = findBookByIsbn(isbn);
+        book.setQuantity(book.getQuantity()-quantity);
+        bookRepository.save(book);
+    }
 }
