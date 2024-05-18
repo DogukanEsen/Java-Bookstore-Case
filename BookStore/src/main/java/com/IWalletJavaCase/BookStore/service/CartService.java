@@ -22,20 +22,15 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final UserService userService;
     private final BookService bookService;
-    private final CreateCartService createCartService;
     private final CartItemDTOMapper cartItemDTOMapper;
-    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, UserService userService, BookService bookService, CreateCartService createCartService, CartItemDTOMapper cartItemDTOMapper) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, UserService userService, BookService bookService, CartItemDTOMapper cartItemDTOMapper) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.userService = userService;
         this.bookService = bookService;
-        this.createCartService = createCartService;
         this.cartItemDTOMapper = cartItemDTOMapper;
     }
 
-    public Cart createCart(User user) {
-        return createCartService.createCart(user);
-    }
     public Cart getCartByJwt(HttpServletRequest request){
         String username=userService.getUsernameFromRequest(request);
         User user = userService.getByUsername(username);
