@@ -31,19 +31,14 @@ public class CartService {
         this.cartItemDTOMapper = cartItemDTOMapper;
     }
 
-    public Cart getCartByJwt(HttpServletRequest request){
-        String username=userService.getUsernameFromRequest(request);
-        User user = userService.getByUsername(username);
-        Cart cart = cartRepository.findByUserId(user.getId()).orElse(null);
-        return cart;
-    }
-    public List<CartItemDTO> addBookToCart(HttpServletRequest request, CartItemDTO cartItemDTO) {
-        Cart cart = getCartByJwt(request);
+
+    public List<CartItemDTO> addBookToCart(Long userId, CartItemDTO cartItemDTO) {
+        Cart cart = findCartbyUserId(userId);
         //Önceki varlıgın sorgulanması
         CartItem expectedCartItem = findAndUpdateCartItem(cart,cartItemDTO);
         if(expectedCartItem!=null)
             return findCartItems(cart).stream().map(cartItemDTOMapper::convert).collect(Collectors.toList());
-        if(checkStock(cartItemDTO.quantity(),cartItemDTO.bookIsbn()) && cartItemDTO.quantity()>0){
+        if(checkStock(cartItemDTO.quantity(),cartItemDTO.bookIsbn()) && cartItemDTO.quantity()>=0){
             Book book = bookService.findBookByIsbn(cartItemDTO.bookIsbn());
             CartItem cartItem = new CartItem(book,cartItemDTO.quantity(),cart);
             cartItemRepository.save(cartItem);
@@ -52,28 +47,32 @@ public class CartService {
         throw new IllegalArgumentException("Stok yetersiz veya negatif değer girildi.");
     }
 
-    public List<CartItemDTO> deleteBookToCart(HttpServletRequest request, CartItemDTO cartItemDTO){
-        Cart cart = getCartByJwt(request);
-        CartItemDTO cartItemDTOMinus = new CartItemDTO(cartItemDTO.bookIsbn(),-cartItemDTO.quantity());
-        CartItem expectedCartItem = findAndUpdateCartItem(cart,cartItemDTOMinus);
+    public List<CartItemDTO> deleteBookToCart(Long userId, CartItemDTO cartItemDTO){
+        if(cartItemDTO.quantity()>0 && bookService.findBookByIsbn(cartItemDTO.bookIsbn())!=null){
+            Cart cart = findCartbyUserId(userId);
+            CartItemDTO cartItemDTOMinus = new CartItemDTO(cartItemDTO.bookIsbn(),-cartItemDTO.quantity());
+            CartItem expectedCartItem = findAndUpdateCartItem(cart,cartItemDTOMinus);
 
-        return findCartItems(cart).stream().map(cartItemDTOMapper::convert).collect(Collectors.toList());
+            return findCartItems(cart).stream().map(cartItemDTOMapper::convert).collect(Collectors.toList());
+        }
+        throw new IllegalArgumentException("Stok yetersiz veya negatif değer girildi.");
     }
 
-    public List<CartItemDTO> getCartItems(HttpServletRequest request) {
-        Cart cart = getCartByJwt(request);
+    public List<CartItemDTO> getCartItems(Long userId) {
+        Cart cart = findCartbyUserId(userId);
         return cartItemRepository.findAllByCart(cart).stream().map(cartItemDTOMapper::convert).collect(Collectors.toList());
     }
 
     public List<CartItem> findCartItems(Cart cart) {
         return cartItemRepository.findAllByCart(cart);
     }
-    public String checkPayment(HttpServletRequest request){
-        Cart cart = getCartByJwt(request);
+    public String checkPayment(Long userId){
+        Cart cart = findCartbyUserId(userId);
         List<CartItem> cartItems = findCartItems(cart);
         double totalPrice=0;
         for(CartItem item : cartItems){
             totalPrice+=item.getQuantity()*item.getBook().getPrice();
+            bookService.removeBookWithIsbn(item.getBook().getIsbn(),item.getQuantity());
             cartItemRepository.delete(item);
         }
         return String.valueOf(totalPrice);
@@ -100,5 +99,9 @@ public class CartService {
     public boolean checkStock(int quantity, String bookIsbn){
         Book book = bookService.findBookByIsbn(bookIsbn);
         return book.getQuantity()>=quantity;
+    }
+
+    public Cart findCartbyUserId(Long userId){
+        return cartRepository.findByUserId(userId).orElseThrow(()-> new IllegalArgumentException("Sepet bulunamadı"));
     }
 }
