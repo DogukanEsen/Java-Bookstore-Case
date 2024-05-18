@@ -5,9 +5,12 @@ import com.IWalletJavaCase.BookStore.DTO.SaveBookDTO;
 import com.IWalletJavaCase.BookStore.exception.BookNotFoundException;
 import com.IWalletJavaCase.BookStore.model.Book;
 import com.IWalletJavaCase.BookStore.repository.BookRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,18 +18,14 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+@ExtendWith(MockitoExtension.class)
 class BookServiceTest {
-    private BookService bookService;
+    @Mock
     private BookRepository bookRepository;
+    @Mock
     private BookDTOMapper bookDTOMapper;
-    @BeforeEach
-    public void setUp() throws Exception{
-        bookRepository = Mockito.mock(BookRepository.class);
-        bookDTOMapper = Mockito.mock(BookDTOMapper.class);
-
-        bookService = new BookService(bookRepository,bookDTOMapper);
-    }
+    @InjectMocks
+    private BookService bookService;
 
     @Test
     public void whenSaveBookCalledWithValidRequest_itShouldReturnValidSaveBookDTO(){
