@@ -59,8 +59,9 @@ public class UserService implements UserDetailsService  {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
             tokenService.invalidateToken(token);
+            return "Logged out successfully.";
         }
-        return "Logged out successfully.";
+        throw new IllegalArgumentException("Jwt null veya geçerli değil ");
     }
 
     public Long findUserIdbyUsername(String username){
