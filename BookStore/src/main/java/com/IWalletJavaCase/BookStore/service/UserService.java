@@ -37,11 +37,11 @@ public class UserService implements UserDetailsService  {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
-        return user.orElseThrow(EntityNotFoundException::new);
+        return user.orElseThrow(()->new UsernameNotFoundException("Username kayıtlı degil."));
     }
 
     public User getByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
+        return userRepository.findByUsername(username).orElseThrow(()->new UsernameNotFoundException("Username kayıtlı degil."));
     }
 
     public RegisterLoginUserDTO registerUser(RegisterLoginUserDTO userRequest){
@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService  {
     }
 
     public User findUserbyUserId(Long userid){
-        return userRepository.findById(userid).orElse(null);
+        return userRepository.findById(userid).orElseThrow(()->new IllegalArgumentException("Username kayıtlı degil."));
     }
     public String logout(String authorizationHeader){
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {

@@ -21,6 +21,9 @@ public class LoginUserService {
     }
 
     public String loginUser(RegisterLoginUserDTO request){
+        if (request.username() == null || request.password() == null) {
+            throw new IllegalArgumentException("Username and password cannot be null");
+        }
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         if (authentication.isAuthenticated()) {
             return jwtTokenUtil.generateToken(request.username());
