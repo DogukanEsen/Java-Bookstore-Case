@@ -1,17 +1,9 @@
 package com.IWalletJavaCase.BookStore.controller;
 
 import com.IWalletJavaCase.BookStore.DTO.RegisterLoginUserDTO;
-import com.IWalletJavaCase.BookStore.model.User;
-import com.IWalletJavaCase.BookStore.security.JwtTokenUtil;
-import com.IWalletJavaCase.BookStore.service.TokenService;
+import com.IWalletJavaCase.BookStore.service.LoginUserService;
 import com.IWalletJavaCase.BookStore.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,7 +17,7 @@ public class AuthController {
     }
 
     @PostMapping("/registerUser")
-    public ResponseEntity<User> addUser(@RequestBody RegisterLoginUserDTO request) {
+    public ResponseEntity<RegisterLoginUserDTO> addUser(@RequestBody RegisterLoginUserDTO request) {
         return ResponseEntity.ok(userService.registerUser(request));
     }
 
