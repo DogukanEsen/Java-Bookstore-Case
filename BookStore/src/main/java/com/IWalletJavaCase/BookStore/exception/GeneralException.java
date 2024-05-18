@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -47,5 +48,10 @@ public class GeneralException extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> generalExceptionHandler(Exception exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        return ex.getMessage();
     }
 }
